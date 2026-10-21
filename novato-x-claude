@@ -1,0 +1,31 @@
+.github/workflows/build-mcpack.ymlname: Build mcpack (Android)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: python -m pip install -r requirements.txt
+
+      - name: Preparar entorno (descarga shaderc y datos de materiales)
+        run: |
+          chmod +x build.sh
+          ./build.sh setup
+
+      - name: Compilar pack para Android
+        run: ./build.sh pack -p android
+
+      - name: Subir mcpack
+        uses: actions/upload-artifact@v4
+        with:
+          name: newb-x-claude-mcpack
+          path: build/*.mcpack
